@@ -1,0 +1,147 @@
+\documentclass{notes}
+
+\title{A line-integrated density synthetic diagnostic}
+\author{Mathias Hoppe}
+
+\newcommand{\nhat}{\hat{\bb{n}}}
+
+\begin{document}
+	\maketitle
+
+	In this document we describe how to simulate a line-integrated density
+	measurement, given a plasma geometry and electron density $n_e(r)$
+	parametrized by a flux-surface label $r$. Within the assumptions made in
+	\DREAM, the electron density is a flux function. The problem of calculating
+	the line-integrated density thus reduces to a geometrical problem.
+
+	Consider a line extending through the plasma from a point $\bb{x}_0$, in
+	the direction $\nhat$. The line-integrated density is given by
+	\begin{equation}
+		\bar{n}_e =
+			\int_{\ell_1}^{\ell_2} n_e\left(r(\ell)\right)\,\dd\ell,
+	\end{equation}
+	where $\ell_1$ is the first point along the line-of-sight which intersects
+	the plasma and $\ell_2$ is the last point.
+
+	\section*{Determining integration limits}
+	To determine $\ell_1$ and $\ell_2$, we select the 2D contour corresponding
+	to the last closed flux surface and iterate through all line segments making
+	up this contour. For each pair of points $(x_i,z_i)$ and $(x_{i+1},z_{i+1})$
+	we must determine if there is an $\ell$ such that
+	\begin{equation}
+		\begin{cases}
+			\min\left(x_i,x_{i+1}\right)\cos\phi \leq \xhat\cdot\left(\bb{x}_0+\ell\nhat\right) \leq \max\left(x_i,x_{i+1}\right)\cos\phi,\\
+			\min\left(x_i,x_{i+1}\right)\sin\phi \leq \yhat\cdot\left(\bb{x}_0+\ell\nhat\right) \leq \max\left(x_i,x_{i+1}\right)\sin\phi,\\
+			\min\left(z_i,z_{i+1}\right)\leq \zhat\cdot\left(\bb{x}_0+\ell\nhat\right) \leq \max\left(z_i,z_{i+1}\right),
+		\end{cases}
+	\end{equation}
+	for any toroidal angle $\phi\in[0,2\pi)$. The first two conditions can
+	alternatively be substituted for the more straightforward condition
+	\begin{equation}
+		\left[\min\left(x_i,x_{i+1}\right)\right]^2\leq
+		\left[\xhat\cdot\left(\bb{x}_0+\ell\nhat\right)\right]^2 +
+		\left[\yhat\cdot\left(\bb{x}_0+\ell\nhat\right)\right]^2 \leq
+		\left[\max\left(x_i,x_{i+1}\right)\right]^2
+	\end{equation}
+
+	\emph{Construct a parametrization of the LCFS contour, in a 2D plane, which
+		allows us to solve for when the two lines intersect?}
+	
+	\begin{equation}
+		\begin{cases}
+			\left[x_i + t\left(x_{i+1}-x_i\right)\right]^2 =
+				\left(x_0+\ell n_x\right)^2 + \left(y_0+\ell n_y\right)^2,\\
+			z_i + t\left(z_{i+1}-z_i\right) =
+				z_0 + \ell n_z.
+		\end{cases}
+	\end{equation}
+	Solving the second equation yields
+	\begin{equation}\label{eq:t}
+		t = \frac{z_0-z_i + \ell n_z}{z_{i+1}-z_i},
+	\end{equation}
+	which can be substituted into the first equation to yield the second-degree
+	polynomial equation
+	\begin{equation}
+		\begin{gathered}
+			\left[
+				x_i + \left(z_0-z_i+\ell n_z\right)\frac{x_{i+1}-x_i}{z_{i+1}-z_i}
+			\right]^2 =
+			x_0^2+y_0^2 + 2\ell\left(x_0n_x + y_0n_y\right) + \ell^2\left(n_x^2+n_y^2\right)\\
+			%
+			\Longleftrightarrow\\
+			%
+			x_i^2 +
+			2x_i\left(z_0-z_i+\ell n_z\right)\frac{x_{i+1}-x_i}{z_{i+1}-z_i} +
+			%\left(z_0-z_i+\ell n_z\right)^2
+			\left[\left(z_0-z_i\right)^2 + 2\ell n_z\left(z_0-z_i\right) + \ell^2n_z^2\right]
+			\left(
+				\frac{x_{i+1}-x_i}{z_{i+1}-z_i}
+			\right)^2
+			=\\
+			=
+			x_0^2+y_0^2 + 2\ell\left(x_0n_x + y_0n_y\right) + \ell^2\left(n_x^2+n_y^2\right).
+		\end{gathered}
+	\end{equation}
+	Grouping terms by degree in $\ell$ then yields
+	\begin{equation}
+		\begin{gathered}
+			x_i^2 - x_0^2 - y_0^2 +
+			2x_i\left(z_0-z_i\right)\frac{x_{i+1}-x_i}{z_{i+1}-z_i} +
+			\left(z_0-z_i\right)^2\left(\frac{x_{i+1}-x_i}{z_{i+1}-z_i}\right)^2 +\\
+			%
+			\ell\left[
+				2x_in_z\frac{x_{i+1}-x_i}{z_{i+1}-z_i} +
+				2n_z\left(z_0-z_i\right)\left(
+					\frac{x_{i+1}-x_i}{z_{i+1}-z_i}
+				\right)^2 -
+				2\left(x_0n_x + y_0n_y\right)
+			\right] +\\
+			%
+			\ell^2\left[
+				n_z^2\left(
+					\frac{x_{i+1}-x_i}{z_{i+1}-z_i}
+				\right)^2 -
+				n_x^2 - n_y^2
+			\right] = 0.
+		\end{gathered}
+	\end{equation}
+	This can alternatively be written as
+	\begin{equation}
+		a_0 + a_1\ell + a_2\ell^2 = 0,
+	\end{equation}
+	with
+	\begin{equation}
+		\begin{aligned}
+			a_0 &= 
+				x_i^2 - x_0^2 - y_0^2 +
+				2x_i\left(z_0-z_i\right)\frac{x_{i+1}-x_i}{z_{i+1}-z_i} +
+				\left(z_0-z_i\right)^2\left(\frac{x_{i+1}-x_i}{z_{i+1}-z_i}\right)^2,\\
+			%
+			a_1 &=
+				2x_in_z\frac{x_{i+1}-x_i}{z_{i+1}-z_i} +
+				2n_z\left(z_0-z_i\right)\left(
+					\frac{x_{i+1}-x_i}{z_{i+1}-z_i}
+				\right)^2 -
+				2\left(x_0n_x + y_0n_y\right),\\
+			%
+			a_2 &=
+				n_z^2\left(
+					\frac{x_{i+1}-x_i}{z_{i+1}-z_i}
+				\right)^2 -
+				n_x^2 - n_y^2.
+		\end{aligned}
+	\end{equation}
+	which has the solution
+	\begin{equation}
+		%    l^2 + 2*a1/(2*a2) * l + a0/a2 = 0
+		% => (l + a1/(2*a2))^2 = a0/a2 + a1^2/(4*a2^2) 
+		% => l = -a1/(2*a2) +/- sqrt(a1^2/(4*a2^2) - a0/a2)
+		\ell_{1,2} = -\frac{a_1}{2a_2}\pm \sqrt{\frac{a_1^2}{4a_2^2} - \frac{a_0}{a_2}}.
+	\end{equation}
+	The different solutions correspond to intersections at different toroidal
+	angles. After obtaining solutions $\ell_{1,2}$ we must substitute them back
+	into equation~\eqref{eq:t} and verify that $0\leq t\leq 1$, i.e.\ that the
+	solutions correspond to intersection with the finite line segment we are
+	considering.
+
+\end{document}
